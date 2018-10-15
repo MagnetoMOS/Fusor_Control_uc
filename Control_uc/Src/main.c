@@ -84,7 +84,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		 --Duty; // Dekrementuj wartosc wypelnienia
 		 }
 		 TIM3->CCR1 = Duty;
+
 	}
+}
+
+void Buzzer_signal_short(void)
+{
+	TIM5->CCR1 = 50;
+	HAL_Delay(250);
+	TIM5->CCR1 = 0;
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
@@ -94,6 +102,7 @@ if(GPIO_Pin == Transformers_button_Pin)
 {
 
 	HAL_GPIO_TogglePin(Transformers_GPIO_Port,Transformers_Pin);
+
 
 }
 else if(GPIO_Pin == Injection_safe_button_Pin)
@@ -110,9 +119,10 @@ else if((GPIO_Pin == Injection_button_Pin)&&(HAL_GPIO_ReadPin(Injection_safe_GPI
 }
 
 
-
-
 }
+
+
+
 
 void LED_PWM(uint8_t timer_channel, uint8_t Duty)
 {
@@ -219,6 +229,7 @@ int main(void)
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1);
 
 
   /* USER CODE END 2 */
