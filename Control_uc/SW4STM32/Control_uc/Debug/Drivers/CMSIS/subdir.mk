@@ -18,7 +18,7 @@ Drivers/CMSIS/system_stm32l4xx.o: E:/Cube_projects/LV_side_uc/Control_uc/Src/sys
 	@echo 'Building file: $<'
 	@echo 'Invoking: MCU GCC Compiler'
 	@echo $(PWD)
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 '-D__weak=__attribute__((weak))' '-D__packed=__attribute__((__packed__))' -DUSE_HAL_DRIVER -DSTM32L471xx -I"E:/Cube_projects/LV_side_uc/Control_uc/Inc" -I"E:/Cube_projects/LV_side_uc/Control_uc/Drivers/STM32L4xx_HAL_Driver/Inc" -I"E:/Cube_projects/LV_side_uc/Control_uc/Drivers/STM32L4xx_HAL_Driver/Inc/Legacy" -I"E:/Cube_projects/LV_side_uc/Control_uc/Drivers/CMSIS/Device/ST/STM32L4xx/Include" -I"E:/Cube_projects/LV_side_uc/Control_uc/Drivers/CMSIS/Include"  -Og -g3 -Wall -fmessage-length=0 -ffunction-sections -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 '-D__weak=__attribute__((weak))' '-D__packed=__attribute__((__packed__))' -DUSE_HAL_DRIVER -DSTM32L471xx -I"E:/Cube_projects/LV_side_uc/Control_uc/Inc" -I"E:/Cube_projects/LV_side_uc/Control_uc/Drivers/STM32L4xx_HAL_Driver/Inc" -I"E:/Cube_projects/LV_side_uc/Control_uc/Drivers/STM32L4xx_HAL_Driver/Inc/Legacy" -I"E:/Cube_projects/LV_side_uc/Control_uc/Drivers/CMSIS/Device/ST/STM32L4xx/Include" -I"E:/Cube_projects/LV_side_uc/Control_uc/Drivers/CMSIS/Include" -I"E:/Cube_projects/LV_side_uc/Control_uc/Inc"  -Og -g3 -Wall -fmessage-length=0 -ffunction-sections -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

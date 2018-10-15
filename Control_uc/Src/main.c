@@ -53,7 +53,7 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
+uint8_t Duty = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -61,6 +61,58 @@ void SystemClock_Config(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+	if (htim->Instance == TIM3) {
+		static uint8_t InterruptPrescaler = 0; // licznik przerwan
+		 static uint8_t CzyRosnie = 1; // Flaga kierunku zliczania
+
+		 ++InterruptPrescaler; // Inkrementacja numeru przerwania
+
+		 // Jezeli wywolalo sie 40 przerwanie z rzedu
+		 if (InterruptPrescaler == 2) {
+		 InterruptPrescaler = 0; // wyzeruj licznik przerwan
+
+		 if (Duty == 100) // Jezeli wypelnienie jest rowne 100
+		 CzyRosnie = 0; // Zmien kierunek zliczania w dol
+
+		 else if (Duty == 0) // Jezeli wypelnienie rowne 0
+		 CzyRosnie = 1; // Zmien kierunek zliczania w gore
+
+		 if (CzyRosnie) // Jezeli zliczamy w gore
+		 ++Duty; // Inkrementuj wartosc wypelnienia
+		 else//Jezeli zliczamy w dol
+		 --Duty; // Dekrementuj wartosc wypelnienia
+		 }
+		 TIM3->CCR1 = Duty;
+	}
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+
+if(GPIO_Pin == Transformers_button_Pin)
+{
+
+	HAL_GPIO_TogglePin(Transformers_GPIO_Port,Transformers_Pin);
+
+}
+else if(GPIO_Pin == Injection_safe_button_Pin)
+{
+
+	HAL_GPIO_TogglePin(Injection_safe_GPIO_Port, Injection_safe_Pin);
+
+}
+else if((GPIO_Pin == Injection_button_Pin)&&(HAL_GPIO_ReadPin(Injection_safe_GPIO_Port, Injection_safe_Pin)))
+{
+
+	HAL_GPIO_TogglePin(Injection_GPIO_Port, Injection_Pin);
+
+}
+
+
+
+
+}
 
 void LED_PWM(uint8_t timer_channel, uint8_t Duty)
 {
@@ -78,6 +130,46 @@ void LED_PWM(uint8_t timer_channel, uint8_t Duty)
 		default:
 			break;
 	}
+}
+
+void LED_Sweep(void)
+{
+
+	LED_PWM(1, 100);
+	HAL_Delay(150);
+	LED_PWM(2, 100);
+	LED_PWM(1, 0);
+	HAL_Delay(150);
+	LED_PWM(3, 100);
+	LED_PWM(2, 0);
+	HAL_Delay(150);
+	LED_PWM(2, 100);
+	LED_PWM(3, 0);
+	HAL_Delay(150);
+	LED_PWM(1, 100);
+	LED_PWM(2, 0);
+	HAL_Delay(150);
+	LED_PWM(1, 0);
+	HAL_Delay(150);
+	LED_PWM(1, 100);
+	HAL_Delay(150);
+	LED_PWM(2, 100);
+	LED_PWM(1, 0);
+	HAL_Delay(150);
+	LED_PWM(3, 100);
+	LED_PWM(2, 0);
+	HAL_Delay(150);
+	LED_PWM(2, 100);
+	LED_PWM(3, 0);
+	HAL_Delay(150);
+	LED_PWM(1, 100);
+	LED_PWM(2, 0);
+	HAL_Delay(150);
+
+}
+
+
+
 
 /* USER CODE END PFP */
 
@@ -123,6 +215,12 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  HAL_TIM_Base_Start_IT(&htim3);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -156,7 +254,13 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.MSICalibrationValue = 0;
   RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
+  RCC_OscInitStruct.PLL.PLLM = 1;
+  RCC_OscInitStruct.PLL.PLLN = 40;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
+  RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
+  RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
@@ -166,12 +270,12 @@ void SystemClock_Config(void)
     */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
