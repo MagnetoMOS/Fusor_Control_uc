@@ -176,5 +176,9 @@
 			<type>1</type>
 			<location>PARENT-2-PROJECT_LOC//Src/system_stm32l4xx.c</location>
 		</link>
-  </linkedResources>
+  <link>
+      <name>Application/User/dma.c</name>
+      <type>1</type>
+      <location>PARENT-2-PROJECT_LOC/Src/dma.c</location>
+    </link></linkedResources>
 </projectDescription>
