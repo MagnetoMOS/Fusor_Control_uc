@@ -51,7 +51,10 @@
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
-
+volatile uint8_t transformer_set_flag  = 0;
+volatile uint8_t injection_safe_set_flag  = 0;
+volatile uint8_t injection_set_flag  = 0;
+volatile uint8_t button_state_changed_flag = 0;
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 uint8_t Duty = 0;
@@ -99,10 +102,27 @@ void Buzzer_signal_short(void)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 
+	button_state_changed_flag = 1;
+
+
+	if(HAL_GPIO_ReadPin(Injection_safe_GPIO_Port, Injection_safe_Pin == 0))
+	{
+		HAL_GPIO_WritePin(Injection_GPIO_Port, Injection_Pin, RESET);
+	}
+
 if(GPIO_Pin == Transformers_button_Pin)
 {
 
 	HAL_GPIO_TogglePin(Transformers_GPIO_Port,Transformers_Pin);
+
+	if(HAL_GPIO_ReadPin(Transformers_GPIO_Port,Transformers_Pin))
+		{
+		transformer_set_flag  = 1;
+		}
+	else
+		{
+		transformer_set_flag  = 0;
+		}
 
 
 }
@@ -111,18 +131,36 @@ else if(GPIO_Pin == Injection_safe_button_Pin)
 
 	HAL_GPIO_TogglePin(Injection_safe_GPIO_Port, Injection_safe_Pin);
 
+	if(HAL_GPIO_ReadPin(Injection_safe_GPIO_Port, Injection_safe_Pin))
+		{
+		injection_safe_set_flag  = 1;
+		}
+	else
+		{
+		injection_safe_set_flag  = 0;
+		}
+
 }
 else if((GPIO_Pin == Injection_button_Pin)&&(HAL_GPIO_ReadPin(Injection_safe_GPIO_Port, Injection_safe_Pin)))
 {
 
 	HAL_GPIO_TogglePin(Injection_GPIO_Port, Injection_Pin);
 
-}
+
+	if(HAL_GPIO_ReadPin(Injection_GPIO_Port, Injection_Pin))
+		{
+		injection_set_flag  = 1;
+		}
+	else
+		{
+		injection_set_flag  = 0;
+		}
 
 
 }
 
 
+}
 
 
 void LED_PWM(uint8_t timer_channel, uint8_t Duty)
@@ -179,7 +217,39 @@ void LED_Sweep(void)
 
 }
 
+void Buttons_LCD_reaction(uint8_t transformers, uint8_t injection_safe, uint8_t injection)
+{
+	// Transformers flag
+	if(transformers == 1)
+		{
+			LCD_Send_Str_Pos("TRANSFORMERS SET", 0, 0);
+		}
+	else
+		{
+			LCD_Send_Str_Pos("                    ", 0, 0);
+		}
+	// Injection safe flag
+	if(injection_safe == 1)
+		{
+			LCD_Send_Str_Pos("INJECTION UNLOCKED", 0, 1);
+		}
+	else
+		{
+			LCD_Send_Str_Pos("                    ", 0, 1);
+		}
+	//Injection flag
+	if(injection == 1)
+		{
+			LCD_Send_Str_Pos("INJECTION", 0, 2);
+		}
+	else
+		{
+			LCD_Send_Str_Pos("                    ", 0, 2);
+		}
 
+
+
+}
 
 
 /* USER CODE END PFP */
@@ -233,6 +303,10 @@ int main(void)
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1);
 
+  LCD_Init();
+  LCD_Clear();
+
+
 
   /* USER CODE END 2 */
 
@@ -240,7 +314,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
+if(button_state_changed_flag == 1)
+{
+	Buttons_LCD_reaction(transformer_set_flag, injection_safe_set_flag, injection_set_flag);
+	button_state_changed_flag = 0;
+}
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */

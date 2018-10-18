@@ -34,7 +34,8 @@ Application/User/i2c.o: E:/Cube_projects/LV_side_uc/Control_uc/Src/i2c.c \
  E:/Cube_projects/LV_side_uc/Control_uc/Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h \
  E:/Cube_projects/LV_side_uc/Control_uc/Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h \
  E:/Cube_projects/LV_side_uc/Control_uc/Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h \
- E:/Cube_projects/LV_side_uc/Control_uc/Inc/gpio.h
+ E:/Cube_projects/LV_side_uc/Control_uc/Inc/gpio.h \
+ E:/Cube_projects/LV_side_uc/Control_uc/Inc/dma.h
 
 E:/Cube_projects/LV_side_uc/Control_uc/Inc/i2c.h:
 
@@ -107,3 +108,5 @@ E:/Cube_projects/LV_side_uc/Control_uc/Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4x
 E:/Cube_projects/LV_side_uc/Control_uc/Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h:
 
 E:/Cube_projects/LV_side_uc/Control_uc/Inc/gpio.h:
+
+E:/Cube_projects/LV_side_uc/Control_uc/Inc/dma.h:
